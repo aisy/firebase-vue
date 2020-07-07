@@ -1,5 +1,9 @@
 <template>
   <div class="home">
+    <router-link to="/writer/create">
+      <v-btn>Writer</v-btn>
+    </router-link>
+
     <v-container>
       <v-row>
         <v-col cols="3" v-for="book in books" :key="book.id">
@@ -31,14 +35,23 @@ export default {
     };
   },
   methods: {
-    getData() {
-      db.collection("books").onSnapshot(snapshot => {
-        const listItem = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        this.books = listItem;
-      });
+    async getData() {
+      try {
+        // melakukan await data
+        let booksData = await db.collection("books").get();
+        // buat variable untuk menampung
+        let allBooks = [];
+        booksData.forEach(doc => {
+          allBooks.push({
+            id: doc.id,
+            key: doc.id,
+            ...doc.data()
+          });
+        });
+        this.books = allBooks;
+      } catch (error) {
+        console.warn(error);
+      }
     }
   },
   mounted() {
